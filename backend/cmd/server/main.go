@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"interview-prep/backend/config"
 	"interview-prep/backend/internal/handlers"
@@ -39,9 +38,9 @@ func SetupStorage() *storage.PostgresStorage {
 		log.Fatal("can't connect to storage: ", err)
 	}
 
-	if err := s.Init(context.TODO()); err != nil {
+	/*if err := s.Init(context.TODO()); err != nil {
 		log.Fatal("can't init storage: ", err)
-	}
+	}*/
 
 	return s
 }

@@ -6,7 +6,7 @@ type Question struct {
 	ID        int
 	Title     string
 	Answer    string
-	Tag       string
+	Tags      []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

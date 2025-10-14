@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Prep</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Подготовка к собеседованиям</h1>
+            <button id="addQuestionBtn">+ Добавить вопрос</button>
+        </header>
+        
+        <div class="questions-list" id="questionsList">
+            <!-- Вопросы будут загружены здесь -->
+        </div>
+        
+        <!-- Модальное окно для добавления вопроса -->
+        <div id="questionModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Добавить новый вопрос</h2>
+                <form id="questionForm">
+                    <input type="text" id="questionTitle" placeholder="Вопрос" required>
+                    <textarea id="questionAnswer" placeholder="Развернутый ответ" required></textarea>
+                    <input type="text" id="questionTags" placeholder="Теги (через запятую)">
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

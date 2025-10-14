@@ -1,9 +1,7 @@
 package storage
 
 import (
-	"context"
 	"database/sql"
-	"fmt"
 	"interview-prep/backend/internal/models"
 	"log"
 
@@ -31,12 +29,12 @@ func NewPosgresStorage(connStr string) (*PostgresStorage, error) {
 
 func (s *PostgresStorage) CreateQuestion(q *models.Question) error {
 	query := `
-		INSERT INTO questions (title, answer, tag) 
+		INSERT INTO questions (title, answer, tags) 
         VALUES ($1, $2, $3) 
         RETURNING id, created_at, updated_at
 	`
 
-	return s.db.QueryRow(query, q.Title, q.Answer, q.Tag).Scan(
+	return s.db.QueryRow(query, q.Title, q.Answer, q.Tags).Scan(
 		&q.ID, &q.CreatedAt, &q.UpdatedAt,
 	)
 }
@@ -47,7 +45,7 @@ func (s *PostgresStorage) Close() error {
 	return nil
 }
 
-func (s *PostgresStorage) Init(ctx context.Context) error {
+/*func (s *PostgresStorage) Init(ctx context.Context) error {
 	q := `
 		CREATE TABLE IF NOT EXISTS interview_prep (
         id SERIAL PRIMARY KEY,
@@ -64,7 +62,7 @@ func (s *PostgresStorage) Init(ctx context.Context) error {
 		return fmt.Errorf("can't create table: %w", err)
 	}
 	return nil
-}
+}*/
 
 func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 	q := `
@@ -82,7 +80,7 @@ func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 	var question []models.Question
 	for rows.Next() {
 		var q models.Question
-		err := rows.Scan(&q.ID, &q.Title, &q.Answer, &q.Tag, &q.CreatedAt, &q.UpdatedAt)
+		err := rows.Scan(&q.ID, &q.Title, &q.Answer, &q.Tags, &q.CreatedAt, &q.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
