@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  DB:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+  
+  app:
+    build: .
+    ports: 
+      - "8000:8000"
+    depends_on:
+      - DB
+
+      

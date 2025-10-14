@@ -1,4 +1,3 @@
-// frontend/js/app.js
 class InterviewApp {
     constructor() {
         this.questions = [];
