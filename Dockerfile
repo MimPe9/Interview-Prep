@@ -1,0 +1,14 @@
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN go build -o interview-prep ./backend/cmd/server/main.go
+
+EXPOSE 8000
+
+CMD ["./interview-prep"]
