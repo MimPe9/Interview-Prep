@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o interview-prep ./backend/cmd/server/main.go
+RUN go build -o interview-prep ./backend/cmd/server/
 
 EXPOSE 8000
 

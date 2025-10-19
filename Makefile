@@ -4,13 +4,13 @@ run:
     go run cmd/server/main.go
 
 build:
-    go build -o bin/server cmd/server/main.go
+    docker-compose build --no-cache
 
 docker-up:
-    docker-compose -f compose.yml up -d
+    docker-compose up
 
 docker-down:
-    docker-compose -f compose.yml down
+    docker-compose down
 
 test:
     go test ./...

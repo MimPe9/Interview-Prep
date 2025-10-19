@@ -12,11 +12,14 @@ import (
 )
 
 func main() {
-	s := SetupStorage()
+	s := setupStorage()
 	defer s.Close()
 
 	r := gin.Default()
 	r.Use(cors.Default())
+
+	r.Static("/static", "./frontend")
+	r.StaticFile("/", "./frontend/html/index.html")
 
 	questionHandler := handlers.NewQuestionHandler(s)
 
@@ -29,18 +32,17 @@ func main() {
 	r.Run(":8000")
 }
 
-func SetupStorage() *storage.PostgresStorage {
+func setupStorage() *storage.PostgresStorage {
 	connStr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=%s",
-		config.DB_USER, config.DB_NAME, config.DB_PASS, config.DB_HOST, config.DB_PORT, config.DB_SSLMODE)
+		config.GetDBUser(), config.GetDBName(), config.GetDBPass(),
+		config.GetDBHost(), config.GetDBPort(), config.GetDBSSLMode())
+
+	log.Printf("Connecting to database: %s@%s:%s", config.GetDBUser(), config.GetDBHost(), config.GetDBPort())
 
 	s, err := storage.NewPosgresStorage(connStr)
 	if err != nil {
 		log.Fatal("can't connect to storage: ", err)
 	}
-
-	/*if err := s.Init(context.TODO()); err != nil {
-		log.Fatal("can't init storage: ", err)
-	}*/
 
 	return s
 }

@@ -2,10 +2,13 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"interview-prep/backend/internal/models"
 	"log"
+	"strings"
+	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 type PostgresStorage struct {
@@ -14,17 +17,31 @@ type PostgresStorage struct {
 
 // Подключаемся к БД
 func NewPosgresStorage(connStr string) (*PostgresStorage, error) {
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
+	log.Printf("Connection string: %s", connStr)
+
+	var db *sql.DB
+	var err error
+
+	// Попытки подключения с задержкой
+	for i := 0; i < 10; i++ {
+		db, err = sql.Open("postgres", connStr)
+		if err != nil {
+			log.Printf("Attempt %d: sql.Open error: %v", i+1, err)
+			time.Sleep(2 * time.Second)
+			continue
+		}
+
+		err = db.Ping()
+		if err == nil {
+			log.Println("Successfully connected to database")
+			return &PostgresStorage{db: db}, nil
+		}
+
+		log.Printf("Attempt %d: Failed to ping database: %v", i+1, err)
+		time.Sleep(2 * time.Second)
 	}
 
-	//Проверяем соединение
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return &PostgresStorage{db: db}, nil
+	return nil, fmt.Errorf("failed to connect to database after retries: %w", err)
 }
 
 func (s *PostgresStorage) CreateQuestion(q *models.Question) error {
@@ -34,7 +51,7 @@ func (s *PostgresStorage) CreateQuestion(q *models.Question) error {
         RETURNING id, created_at, updated_at
 	`
 
-	return s.db.QueryRow(query, q.Title, q.Answer, q.Tags).Scan(
+	return s.db.QueryRow(query, q.Title, q.Answer, pq.Array(q.Tags)).Scan(
 		&q.ID, &q.CreatedAt, &q.UpdatedAt,
 	)
 }
@@ -45,30 +62,11 @@ func (s *PostgresStorage) Close() error {
 	return nil
 }
 
-/*func (s *PostgresStorage) Init(ctx context.Context) error {
-	q := `
-		CREATE TABLE IF NOT EXISTS interview_prep (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-		answer TEXT NOT NULL,
-		tags TEXT[],
-		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-	`
-
-	_, err := s.db.ExecContext(ctx, q)
-	if err != nil {
-		return fmt.Errorf("can't create table: %w", err)
-	}
-	return nil
-}*/
-
 func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 	q := `
-		SELECT id, title, answer, tag, created_at, updated_at
+		SELECT id, title, answer, tags, created_at, updated_at
         FROM questions
-        ORDER BY tag DESC
+        ORDER BY tags DESC
 	`
 
 	rows, err := s.db.Query(q)
@@ -80,9 +78,16 @@ func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 	var question []models.Question
 	for rows.Next() {
 		var q models.Question
-		err := rows.Scan(&q.ID, &q.Title, &q.Answer, &q.Tags, &q.CreatedAt, &q.UpdatedAt)
+		var tags string
+		err := rows.Scan(&q.ID, &q.Title, &q.Answer, &tags, &q.CreatedAt, &q.UpdatedAt)
 		if err != nil {
 			return nil, err
+		}
+
+		if tags != "" {
+			q.Tags = strings.Split(tags, ",")
+		} else {
+			q.Tags = []string{}
 		}
 		question = append(question, q)
 	}
