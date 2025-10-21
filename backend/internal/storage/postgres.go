@@ -84,13 +84,33 @@ func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 			return nil, err
 		}
 
-		if tags != "" {
-			q.Tags = strings.Split(tags, ",")
-		} else {
-			q.Tags = []string{}
-		}
+		q.Tags = parse(tags)
 		question = append(question, q)
 	}
 
 	return question, nil
+}
+
+func parse(str string) []string {
+	if str == "" {
+		return []string{}
+	}
+
+	cleaned := strings.Trim(str, "{}")
+	if cleaned == "" {
+		return []string{}
+	}
+
+	rawTags := strings.Split(cleaned, ",")
+	tags := make([]string, 0, len(rawTags))
+
+	for _, tag := range rawTags {
+		trimmed := strings.TrimSpace(tag)
+		trimmed = strings.Trim(trimmed, `"`)
+		if trimmed != "" {
+			tags = append(tags, trimmed)
+		}
+	}
+
+	return tags
 }

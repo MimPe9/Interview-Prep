@@ -37,8 +37,14 @@ class InterviewApp {
 
     async loadQuestions() {
         try {
+            console.log('Начинаю загрузку вопросов...');
             const response = await fetch('/api/v1/questions');
-            this.questions = await response.json();
+            console.log('Статус ответа:', response.status);
+            
+            const data = await response.json();
+            console.log('Получены вопросы:', data);
+            
+            this.questions = data;
             this.renderQuestions();
         } catch (error) {
             console.error('Ошибка загрузки вопросов:', error);
@@ -58,17 +64,23 @@ class InterviewApp {
     createQuestionElement(question) {
         const div = document.createElement('div');
         div.className = 'question-item';
+        
+        // Безопасное получение значений
+        const title = question.title || 'Без названия';
+        const answer = question.answer || 'Нет ответа';
+        const tags = question.tags || [];
+        
         div.innerHTML = `
             <div class="question-header">
-                <div class="question-title">${this.escapeHtml(question.title)}</div>
+                <div class="question-title">${this.escapeHtml(title)}</div>
                 <div class="tags">
-                    ${question.tags.map(tag => 
-                        `<span class="tag tag-${tag.toLowerCase()}">${tag}</span>`
+                    ${tags.map(tag => 
+                        `<span class="tag tag-${String(tag).toLowerCase()}">${this.escapeHtml(tag)}</span>`
                     ).join('')}
                 </div>
             </div>
             <div class="question-answer">
-                <div class="answer-content">${this.escapeHtml(question.answer)}</div>
+                <div class="answer-content">${this.escapeHtml(answer)}</div>
             </div>
         `;
 

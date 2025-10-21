@@ -9,6 +9,4 @@ COPY . .
 
 RUN go build -o interview-prep ./backend/cmd/server/
 
-EXPOSE 8000
-
 CMD ["./interview-prep"]

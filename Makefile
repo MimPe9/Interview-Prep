@@ -1,5 +1,3 @@
-.PHONY: run build docker-up docker-down
-
 run:
     go run cmd/server/main.go
 
