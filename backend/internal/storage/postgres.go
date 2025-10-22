@@ -45,6 +45,13 @@ func NewPosgresStorage(connStr string) (*PostgresStorage, error) {
 }
 
 func (s *PostgresStorage) CreateQuestion(q *models.Question) error {
+	var exists bool
+
+	err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM questions WHERE title = $1)", q.Title).Scan(&exists)
+	if err == nil && exists {
+		return fmt.Errorf("question with this title already exists")
+	}
+
 	query := `
 		INSERT INTO questions (title, answer, tags) 
         VALUES ($1, $2, $3) 
@@ -55,6 +62,21 @@ func (s *PostgresStorage) CreateQuestion(q *models.Question) error {
 		&q.ID, &q.CreatedAt, &q.UpdatedAt,
 	)
 }
+
+func (s *PostgresStorage) DeleteQuestion(id int) error {
+	query := `DELETE FROM questions WHERE id = $1`
+	res, err := s.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("question with id %d not found", id)
+	}
+	return nil
+}
+
 func (s *PostgresStorage) Close() error {
 	if s.db != nil {
 		return s.db.Close()
@@ -66,7 +88,7 @@ func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 	q := `
 		SELECT id, title, answer, tags, created_at, updated_at
         FROM questions
-        ORDER BY tags DESC
+        ORDER BY tags ASC
 	`
 
 	rows, err := s.db.Query(q)

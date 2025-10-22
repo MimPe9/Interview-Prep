@@ -4,6 +4,7 @@ import (
 	"interview-prep/backend/internal/models"
 	"interview-prep/backend/internal/storage"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,4 +40,20 @@ func (h *QuestionHandler) GetQuestions(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, quations)
+}
+
+func (h *QuestionHandler) DeleteQuestion(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	if err := h.storage.DeleteQuestion(id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Question delete"})
 }

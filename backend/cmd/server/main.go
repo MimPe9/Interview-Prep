@@ -27,6 +27,7 @@ func main() {
 	{
 		api.GET("/questions", questionHandler.GetQuestions)
 		api.POST("/questions", questionHandler.CreateQuestion)
+		api.DELETE("/questions/:id", questionHandler.DeleteQuestion)
 	}
 
 	r.Run(":8000")

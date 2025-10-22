@@ -65,18 +65,26 @@ class InterviewApp {
         const div = document.createElement('div');
         div.className = 'question-item';
         
+        const id = question.id;
+        if (!id) {
+            console.error('Question has no ID:', question);
+        }
+
         // Безопасное получение значений
         const title = question.title || 'Без названия';
         const answer = question.answer || 'Нет ответа';
         const tags = question.tags || [];
-        
+            
         div.innerHTML = `
             <div class="question-header">
                 <div class="question-title">${this.escapeHtml(title)}</div>
-                <div class="tags">
-                    ${tags.map(tag => 
-                        `<span class="tag tag-${String(tag).toLowerCase()}">${this.escapeHtml(tag)}</span>`
-                    ).join('')}
+                <div class="question-actions">
+                    <div class="tags">
+                        ${tags.map(tag => 
+                            `<span class="tag tag-${String(tag).toLowerCase()}">${this.escapeHtml(tag)}</span>`
+                        ).join('')}
+                    </div>
+                    <button class="delete-btn" data-id="${question.ID}">🗑️</button>
                 </div>
             </div>
             <div class="question-answer">
@@ -90,6 +98,13 @@ class InterviewApp {
                 const answer = div.querySelector('.question-answer');
                 answer.classList.toggle('expanded');
             }
+        });
+
+        // Обработчик удаления
+        const deleteBtn = div.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Предотвращаем раскрытие вопроса
+            this.deleteQuestion(id);
         });
 
         return div;
@@ -122,6 +137,30 @@ class InterviewApp {
         } catch (error) {
             console.error('Ошибка:', error);
             alert('Ошибка при создании вопроса');
+        }
+    }
+
+    async deleteQuestion(id) {
+        if (!confirm('Вы уверены, что хотите удалить этот вопрос?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/v1/questions/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // ИСПРАВЛЕНО: используем lowercase id
+                this.questions = this.questions.filter(q => q.id !== id);
+                this.renderQuestions();
+            } else {
+                const error = await response.json();
+                alert(`Ошибка при удалении: ${error.error}`);
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка при удалении вопроса');
         }
     }
 
