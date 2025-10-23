@@ -108,6 +108,11 @@ h1 {
 .tag-database { background-color: #4DB33D; color: white; }
 .tag-concurrency { background-color: #FF6B6B; color: white; }
 .tag-algorithms { background-color: #FFA726; color: white; }
+.tag-docker {background-color: #0c1149; color: white; }
+.tag-git {background-color: #b87005; color: white; }
+.tag-linux {background-color: #d6ed0c; color: white; }
+.tag-data-structures { background-color: #9C27B0; color: white; }
+.tag-networks { background-color: #ce1d20; color: white; }
 
 .question-answer {
     margin-top: 15px;
@@ -178,4 +183,36 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+}
+
+/* Подсказка тегов */
+.tags-suggestions {
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+
+.suggestions-title {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.available-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.available-tag {
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    transition: all 0.2s;
+}
+
+.available-tag:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }

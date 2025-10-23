@@ -1,6 +1,10 @@
 class InterviewApp {
     constructor() {
         this.questions = [];
+        this.availableTags = [
+            'golang', 'sql', 'database', 'concurrency', 'algorithms',
+            'data-structures', 'networks', 'linux', 'docker', 'git'
+        ];
         this.init();
     }
 
@@ -26,13 +30,124 @@ class InterviewApp {
             this.createQuestion();
         });
 
+        // Обработчик ввода тегов для показа подсказок
+        document.getElementById('questionTags').addEventListener('input', (e) => {
+            this.showTagSuggestions(e.target.value);
+        });
+
+        // Обработчик фокуса на поле тегов
+        document.getElementById('questionTags').addEventListener('focus', (e) => {
+            this.showTagSuggestions(e.target.value);
+        });
+
         // Закрытие модального окна при клике вне его
         window.addEventListener('click', (e) => {
             const modal = document.getElementById('questionModal');
             if (e.target === modal) {
                 this.closeModal();
+                this.hideTagSuggestions();
             }
         });
+    }
+
+    // Показать подсказки тегов
+    showTagSuggestions(inputValue) {
+        this.hideTagSuggestions();
+        
+        if (!inputValue.trim()) {
+            // Если поле пустое, показываем все теги
+            this.renderAllAvailableTags();
+            return;
+        }
+
+        const inputTags = inputValue.split(',').map(tag => tag.trim().toLowerCase());
+        const currentTag = inputTags[inputTags.length - 1];
+        
+        if (!currentTag) {
+            this.renderAllAvailableTags();
+            return;
+        }
+
+        const filteredTags = this.availableTags.filter(tag => 
+            tag.toLowerCase().includes(currentTag.toLowerCase()) && 
+            !inputTags.includes(tag)
+        );
+
+        this.renderTagSuggestions(filteredTags, currentTag);
+    }
+
+     // Скрыть подсказки тегов
+    hideTagSuggestions() {
+        const existingSuggestions = document.getElementById('tagsSuggestions');
+        if (existingSuggestions) {
+            existingSuggestions.remove();
+        }
+    }
+
+    // Показать все доступные теги
+    renderAllAvailableTags() {
+        this.hideTagSuggestions();
+        
+        const tagsInput = document.getElementById('questionTags');
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.id = 'tagsSuggestions';
+        suggestionsDiv.className = 'tags-suggestions';
+        
+        suggestionsDiv.innerHTML = `
+            <div class="suggestions-title">Возможные теги:</div>
+            <div class="available-tags">
+                ${this.availableTags.map(tag => 
+                    `<span class="available-tag tag-${tag}" onclick="interviewApp.addTagToInput('${tag}')">${tag}</span>`
+                ).join('')}
+            </div>
+        `;
+        
+        tagsInput.parentNode.insertBefore(suggestionsDiv, tagsInput.nextSibling);
+    }
+
+    // Показать отфильтрованные теги
+    renderTagSuggestions(tags, currentTag) {
+        if (tags.length === 0) return;
+        
+        this.hideTagSuggestions();
+        
+        const tagsInput = document.getElementById('questionTags');
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.id = 'tagsSuggestions';
+        suggestionsDiv.className = 'tags-suggestions';
+        
+        suggestionsDiv.innerHTML = `
+            <div class="suggestions-title">Возможные теги:</div>
+            <div class="available-tags">
+                ${tags.map(tag => 
+                    `<span class="available-tag tag-${tag}" onclick="interviewApp.addTagToInput('${tag}')">${tag}</span>`
+                ).join('')}
+            </div>
+        `;
+        
+        tagsInput.parentNode.insertBefore(suggestionsDiv, tagsInput.nextSibling);
+    }
+
+    // Добавить тег в поле ввода
+    addTagToInput(tag) {
+        const tagsInput = document.getElementById('questionTags');
+        const currentTags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+        
+        // Убираем текущий частично введенный тег
+        if (currentTags.length > 0) {
+            currentTags.pop();
+        }
+        
+        // Добавляем выбранный тег
+        currentTags.push(tag);
+        tagsInput.value = currentTags.join(', ');
+        
+        // Фокусируемся на поле и скрываем подсказки
+        tagsInput.focus();
+        this.hideTagSuggestions();
+        
+        // Показываем подсказки снова для возможного добавления следующего тега
+        setTimeout(() => this.showTagSuggestions(tagsInput.value), 100);
     }
 
     async loadQuestions() {
@@ -166,10 +281,13 @@ class InterviewApp {
 
     openModal() {
         document.getElementById('questionModal').style.display = 'block';
+        // Показываем подсказки при открытии модального окна
+        setTimeout(() => this.showTagSuggestions(''), 100);
     }
 
     closeModal() {
         document.getElementById('questionModal').style.display = 'none';
+        this.hideTagSuggestions();
     }
 
     escapeHtml(unsafe) {
