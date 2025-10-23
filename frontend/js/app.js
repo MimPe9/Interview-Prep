@@ -3,7 +3,7 @@ class InterviewApp {
         this.questions = [];
         this.availableTags = [
             'golang', 'sql', 'database', 'concurrency', 'algorithms',
-            'data-structures', 'networks', 'linux', 'docker', 'git'
+            'data-structures', 'net', 'linux', 'docker', 'git'
         ];
         this.init();
     }
