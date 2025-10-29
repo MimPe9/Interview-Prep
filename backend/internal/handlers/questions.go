@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"interview-prep/backend/internal/models"
-	"interview-prep/backend/internal/storage"
+	"interviewPrep/backend/internal/models"
+	"interviewPrep/backend/internal/storage"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,6 +1,6 @@
 package storage
 
-import "interview-prep/backend/internal/models"
+import "interviewPrep/backend/internal/models"
 
 type Storage interface {
 	GetAllQuestions() ([]models.Question, error)

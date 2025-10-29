@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"interview-prep/backend/internal/models"
+	"interviewPrep/backend/internal/models"
 
 	"github.com/lib/pq"
 )

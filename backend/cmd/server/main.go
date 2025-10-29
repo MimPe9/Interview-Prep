@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"interview-prep/backend/config"
-	"interview-prep/backend/internal/handlers"
-	"interview-prep/backend/internal/storage"
+	"interviewPrep/backend/config"
+	"interviewPrep/backend/internal/handlers"
+	"interviewPrep/backend/internal/storage"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

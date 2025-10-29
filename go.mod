@@ -1,4 +1,4 @@
-module interview-prep
+module interviewPrep
 
 go 1.23.2
 
