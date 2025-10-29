@@ -1,1 +1,48 @@
+name: CI
 
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code 
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+      
+    - name: Install dependencies
+      run: |
+        cd backend
+        go mod download
+
+    - name: Run tests
+      run: |
+        cd backend
+        go test ./... -v
+  
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker images
+      run: |
+        docker-compose -f compose.ci.yml build
+
+    - name: Test Docker setup
+      run: |
+        docker-compose -f compose.ci.yml up -d
+        sleep 10
+        curl -f http://localhost:8000/ || exit 1
+        docker-compose -f compose.ci.yml down
+      
