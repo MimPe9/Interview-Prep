@@ -35,14 +35,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Set up Docker
+      run: |
+        docker compose version
+
     - name: Build Docker images
       run: |
-        docker-compose -f compose.ci.yml build
+        docker compose -f compose.ci.yml build
 
     - name: Test Docker setup
       run: |
-        docker-compose -f compose.ci.yml up -d
+        docker compose -f compose.ci.yml up -d
         sleep 10
         curl -f http://localhost:8000/ || exit 1
-        docker-compose -f compose.ci.yml down
+        docker compose -f compose.ci.yml down
       
