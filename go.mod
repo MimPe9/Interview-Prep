@@ -1,4 +1,4 @@
-module github.com/MimPe9/interview-prep
+module interview-prep
 
 go 1.23.2
 
