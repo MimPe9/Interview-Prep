@@ -3,10 +3,11 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	"interview-prep/backend/internal/models"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/MimPe9/interview-prep/backend/internal/models"
 
 	"github.com/lib/pq"
 )

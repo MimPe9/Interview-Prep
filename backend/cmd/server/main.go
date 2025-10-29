@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"interview-prep/backend/config"
-	"interview-prep/backend/internal/handlers"
-	"interview-prep/backend/internal/storage"
 	"log"
+
+	"github.com/MimPe9/interview-prep/backend/config"
+	"github.com/MimPe9/interview-prep/backend/internal/handlers"
+	"github.com/MimPe9/interview-prep/backend/internal/storage"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
