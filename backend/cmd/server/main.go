@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"interviewPrep/backend/config"
+	"interviewPrep/backend/internal/cache"
 	"interviewPrep/backend/internal/handlers"
 	"interviewPrep/backend/internal/storage"
 
@@ -16,13 +17,21 @@ func main() {
 	s := setupStorage()
 	defer s.Close()
 
+	redisCache, err := cache.NewRedisCache()
+	if err != nil {
+		log.Printf("Warning: Redis cache not available: %v", err)
+		redisCache = nil
+	} else {
+		defer redisCache.Close()
+	}
+
 	r := gin.Default()
 	r.Use(cors.Default())
 
 	r.Static("/static", "./frontend")
 	r.StaticFile("/", "./frontend/html/index.html")
 
-	questionHandler := handlers.NewQuestionHandler(s)
+	questionHandler := handlers.NewQuestionHandler(s, redisCache)
 
 	api := r.Group("/api/v1")
 	{
