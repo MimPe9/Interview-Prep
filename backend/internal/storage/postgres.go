@@ -114,6 +114,23 @@ func (s *PostgresStorage) GetAllQuestions() ([]models.Question, error) {
 	return question, nil
 }
 
+func (s *PostgresStorage) GetQuestionByID(id int) (*models.Question, error) {
+	q := `
+		SELECT id, title, answer, tags, created_at, updated_at 
+		FROM questions
+		WHERE id = $1
+	`
+
+	var question models.Question
+	var tags string
+	err := s.db.QueryRow(q, id).Scan(&question.ID, &question.Title, &question.Answer, &tags, &question.CreatedAt, &question.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	question.Tags = parse(tags)
+	return &question, nil
+}
+
 func parse(str string) []string {
 	if str == "" {
 		return []string{}

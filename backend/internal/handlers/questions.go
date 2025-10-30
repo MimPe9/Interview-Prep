@@ -43,6 +43,21 @@ func (h *QuestionHandler) GetQuestions(c *gin.Context) {
 	c.JSON(http.StatusOK, quations)
 }
 
+func (h *QuestionHandler) GetQuestion(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+	question, err := h.storage.GetQuestionByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Question not found"})
+		return
+	}
+	c.JSON(http.StatusOK, question)
+}
+
 func (h *QuestionHandler) DeleteQuestion(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -52,7 +67,7 @@ func (h *QuestionHandler) DeleteQuestion(c *gin.Context) {
 	}
 
 	if err := h.storage.DeleteQuestion(id); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Question not found"})
 		return
 	}
 

@@ -261,7 +261,7 @@ class InterviewApp {
         }
 
         try {
-            const response = await fetch(`/api/v1/questions/${id}`, {
+            const response = await fetch(`/api/v1/questions/del/${id}`, {
                 method: 'DELETE',
             });
 

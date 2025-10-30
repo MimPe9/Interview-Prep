@@ -28,7 +28,8 @@ func main() {
 	{
 		api.GET("/questions", questionHandler.GetQuestions)
 		api.POST("/questions", questionHandler.CreateQuestion)
-		api.DELETE("/questions/:id", questionHandler.DeleteQuestion)
+		api.DELETE("/questions/del/:id", questionHandler.DeleteQuestion)
+		api.GET("/questions/:id", questionHandler.GetQuestion)
 	}
 
 	r.Run(":8000")
