@@ -1,3 +1,4 @@
 /config/
 /backend/config/
 .env
+compose.ci.yml

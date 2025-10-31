@@ -189,6 +189,9 @@ class InterviewApp {
         const title = question.title || 'Без названия';
         const answer = question.answer || 'Нет ответа';
         const tags = question.tags || [];
+        
+        // Форматируем ответ с сохранением переносов строк
+        const formattedAnswer = this.formatAnswerText(answer);
             
         div.innerHTML = `
             <div class="question-header">
@@ -199,17 +202,17 @@ class InterviewApp {
                             `<span class="tag tag-${String(tag).toLowerCase()}">${this.escapeHtml(tag)}</span>`
                         ).join('')}
                     </div>
-                    <button class="delete-btn" data-id="${question.ID}">🗑️</button>
+                    <button class="delete-btn" data-id="${id}">🗑️</button>
                 </div>
             </div>
             <div class="question-answer">
-                <div class="answer-content">${this.escapeHtml(answer)}</div>
+                <div class="answer-content">${formattedAnswer}</div>
             </div>
         `;
 
         // Обработчик клика для раскрытия/скрытия ответа
         div.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('tag')) {
+            if (!e.target.classList.contains('tag') && !e.target.classList.contains('delete-btn')) {
                 const answer = div.querySelector('.question-answer');
                 answer.classList.toggle('expanded');
             }
@@ -218,11 +221,21 @@ class InterviewApp {
         // Обработчик удаления
         const deleteBtn = div.querySelector('.delete-btn');
         deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Предотвращаем раскрытие вопроса
+            e.stopPropagation();
             this.deleteQuestion(id);
         });
 
         return div;
+    }
+
+    formatAnswerText(text) {
+        if (!text) return 'Нет ответа';
+        
+        // Экранируем HTML
+        const safeText = this.escapeHtml(text);
+        
+        // Заменяем переносы строк на <br> для корректного отображения
+        return safeText.replace(/\n/g, '<br>');
     }
 
     async createQuestion() {
