@@ -39,6 +39,7 @@ func main() {
 		api.POST("/questions", questionHandler.CreateQuestion)
 		api.DELETE("/questions/del/:id", questionHandler.DeleteQuestion)
 		api.GET("/questions/:id", questionHandler.GetQuestion)
+		api.PUT("/questions/up/:id", questionHandler.UpdateQuestion)
 	}
 
 	r.Run(":8000")

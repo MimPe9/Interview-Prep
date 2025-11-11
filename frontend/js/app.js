@@ -14,49 +14,53 @@ class InterviewApp {
     }
 
     bindEvents() {
-        // Кнопка добавления вопроса
         document.getElementById('addQuestionBtn').addEventListener('click', () => {
             this.openModal();
         });
 
-        // Закрытие модального окна
-        document.querySelector('.close').addEventListener('click', () => {
-            this.closeModal();
+        document.querySelectorAll('.close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if (modal.id === 'questionModal') {
+                    this.closeModal();
+                } else if (modal.id === 'editQuestionModal') {
+                    this.closeEditModal();
+                }
+            });
         });
 
-        // Форма добавления вопроса
         document.getElementById('questionForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.createQuestion();
         });
 
-        // Обработчик ввода тегов для показа подсказок
+        document.getElementById('editQuestionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.updateQuestion();
+        });
+
         document.getElementById('questionTags').addEventListener('input', (e) => {
             this.showTagSuggestions(e.target.value);
         });
 
-        // Обработчик фокуса на поле тегов
-        document.getElementById('questionTags').addEventListener('focus', (e) => {
-            this.showTagSuggestions(e.target.value);
+        document.getElementById('editQuestionTags').addEventListener('input', (e) => {
+            this.showEditTagSuggestions(e.target.value);
         });
 
-        // Закрытие модального окна при клике вне его
         window.addEventListener('click', (e) => {
-            const modal = document.getElementById('questionModal');
-            if (e.target === modal) {
+            if (e.target.id === 'questionModal') {
                 this.closeModal();
-                this.hideTagSuggestions();
+            } else if (e.target.id === 'editQuestionModal') {
+                this.closeEditModal();
             }
         });
     }
 
-    // Показать подсказки тегов
     showTagSuggestions(inputValue) {
         this.hideTagSuggestions();
         
         if (!inputValue.trim()) {
-            // Если поле пустое, показываем все теги
-            this.renderAllAvailableTags();
+            this.renderAllAvailableTags('tagsSuggestions', 'questionTags');
             return;
         }
 
@@ -64,7 +68,7 @@ class InterviewApp {
         const currentTag = inputTags[inputTags.length - 1];
         
         if (!currentTag) {
-            this.renderAllAvailableTags();
+            this.renderAllAvailableTags('tagsSuggestions', 'questionTags');
             return;
         }
 
@@ -73,10 +77,33 @@ class InterviewApp {
             !inputTags.includes(tag)
         );
 
-        this.renderTagSuggestions(filteredTags, currentTag);
+        this.renderTagSuggestions(filteredTags, 'tagsSuggestions', 'questionTags');
     }
 
-     // Скрыть подсказки тегов
+    showEditTagSuggestions(inputValue) {
+        this.hideEditTagSuggestions();
+        
+        if (!inputValue.trim()) {
+            this.renderAllAvailableTags('editTagsSuggestions', 'editQuestionTags');
+            return;
+        }
+
+        const inputTags = inputValue.split(',').map(tag => tag.trim().toLowerCase());
+        const currentTag = inputTags[inputTags.length - 1];
+        
+        if (!currentTag) {
+            this.renderAllAvailableTags('editTagsSuggestions', 'editQuestionTags');
+            return;
+        }
+
+        const filteredTags = this.availableTags.filter(tag => 
+            tag.toLowerCase().includes(currentTag.toLowerCase()) && 
+            !inputTags.includes(tag)
+        );
+
+        this.renderTagSuggestions(filteredTags, 'editTagsSuggestions', 'editQuestionTags');
+    }
+
     hideTagSuggestions() {
         const existingSuggestions = document.getElementById('tagsSuggestions');
         if (existingSuggestions) {
@@ -84,20 +111,24 @@ class InterviewApp {
         }
     }
 
-    // Показать все доступные теги
-    renderAllAvailableTags() {
-        this.hideTagSuggestions();
-        
-        const tagsInput = document.getElementById('questionTags');
+    hideEditTagSuggestions() {
+        const existingSuggestions = document.getElementById('editTagsSuggestions');
+        if (existingSuggestions) {
+            existingSuggestions.remove();
+        }
+    }
+
+    renderAllAvailableTags(suggestionsId, tagsInputId) {
+        const tagsInput = document.getElementById(tagsInputId);
         const suggestionsDiv = document.createElement('div');
-        suggestionsDiv.id = 'tagsSuggestions';
+        suggestionsDiv.id = suggestionsId;
         suggestionsDiv.className = 'tags-suggestions';
         
         suggestionsDiv.innerHTML = `
             <div class="suggestions-title">Возможные теги:</div>
             <div class="available-tags">
                 ${this.availableTags.map(tag => 
-                    `<span class="available-tag tag-${tag}" onclick="interviewApp.addTagToInput('${tag}')">${tag}</span>`
+                    `<span class="available-tag tag-${tag}" onclick="interviewApp.addTagToInput('${tag}', '${tagsInputId}')">${tag}</span>`
                 ).join('')}
             </div>
         `;
@@ -105,22 +136,19 @@ class InterviewApp {
         tagsInput.parentNode.insertBefore(suggestionsDiv, tagsInput.nextSibling);
     }
 
-    // Показать отфильтрованные теги
-    renderTagSuggestions(tags, currentTag) {
+    renderTagSuggestions(tags, suggestionsId, tagsInputId) {
         if (tags.length === 0) return;
         
-        this.hideTagSuggestions();
-        
-        const tagsInput = document.getElementById('questionTags');
+        const tagsInput = document.getElementById(tagsInputId);
         const suggestionsDiv = document.createElement('div');
-        suggestionsDiv.id = 'tagsSuggestions';
+        suggestionsDiv.id = suggestionsId;
         suggestionsDiv.className = 'tags-suggestions';
         
         suggestionsDiv.innerHTML = `
             <div class="suggestions-title">Возможные теги:</div>
             <div class="available-tags">
                 ${tags.map(tag => 
-                    `<span class="available-tag tag-${tag}" onclick="interviewApp.addTagToInput('${tag}')">${tag}</span>`
+                    `<span class="available-tag tag-${tag}" onclick="interviewApp.addTagToInput('${tag}', '${tagsInputId}')">${tag}</span>`
                 ).join('')}
             </div>
         `;
@@ -128,37 +156,31 @@ class InterviewApp {
         tagsInput.parentNode.insertBefore(suggestionsDiv, tagsInput.nextSibling);
     }
 
-    // Добавить тег в поле ввода
-    addTagToInput(tag) {
-        const tagsInput = document.getElementById('questionTags');
+    addTagToInput(tag, inputId) {
+        const tagsInput = document.getElementById(inputId);
         const currentTags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
         
-        // Убираем текущий частично введенный тег
         if (currentTags.length > 0) {
             currentTags.pop();
         }
         
-        // Добавляем выбранный тег
         currentTags.push(tag);
         tagsInput.value = currentTags.join(', ');
-        
-        // Фокусируемся на поле и скрываем подсказки
         tagsInput.focus();
-        this.hideTagSuggestions();
         
-        // Показываем подсказки снова для возможного добавления следующего тега
-        setTimeout(() => this.showTagSuggestions(tagsInput.value), 100);
+        if (inputId === 'questionTags') {
+            this.hideTagSuggestions();
+            setTimeout(() => this.showTagSuggestions(tagsInput.value), 100);
+        } else {
+            this.hideEditTagSuggestions();
+            setTimeout(() => this.showEditTagSuggestions(tagsInput.value), 100);
+        }
     }
 
     async loadQuestions() {
         try {
-            console.log('Начинаю загрузку вопросов...');
             const response = await fetch('/api/v1/questions');
-            console.log('Статус ответа:', response.status);
-            
             const data = await response.json();
-            console.log('Получены вопросы:', data);
-            
             this.questions = data;
             this.renderQuestions();
         } catch (error) {
@@ -181,16 +203,9 @@ class InterviewApp {
         div.className = 'question-item';
         
         const id = question.id;
-        if (!id) {
-            console.error('Question has no ID:', question);
-        }
-
-        // Безопасное получение значений
         const title = question.title || 'Без названия';
         const answer = question.answer || 'Нет ответа';
         const tags = question.tags || [];
-        
-        // Форматируем ответ с сохранением переносов строк
         const formattedAnswer = this.formatAnswerText(answer);
             
         div.innerHTML = `
@@ -202,6 +217,7 @@ class InterviewApp {
                             `<span class="tag tag-${String(tag).toLowerCase()}">${this.escapeHtml(tag)}</span>`
                         ).join('')}
                     </div>
+                    <button class="edit-btn" data-id="${id}">✏️</button>
                     <button class="delete-btn" data-id="${id}">🗑️</button>
                 </div>
             </div>
@@ -210,17 +226,21 @@ class InterviewApp {
             </div>
         `;
 
-        // Обработчик клика для раскрытия/скрытия ответа
         div.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('tag') && !e.target.classList.contains('delete-btn')) {
+            if (!e.target.classList.contains('tag') && 
+                !e.target.classList.contains('delete-btn') &&
+                !e.target.classList.contains('edit-btn')) {
                 const answer = div.querySelector('.question-answer');
                 answer.classList.toggle('expanded');
             }
         });
 
-        // Обработчик удаления
-        const deleteBtn = div.querySelector('.delete-btn');
-        deleteBtn.addEventListener('click', (e) => {
+        div.querySelector('.edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openEditModal(question);
+        });
+
+        div.querySelector('.delete-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             this.deleteQuestion(id);
         });
@@ -230,11 +250,7 @@ class InterviewApp {
 
     formatAnswerText(text) {
         if (!text) return 'Нет ответа';
-        
-        // Экранируем HTML
         const safeText = this.escapeHtml(text);
-        
-        // Заменяем переносы строк на <br> для корректного отображения
         return safeText.replace(/\n/g, '<br>');
     }
 
@@ -257,7 +273,7 @@ class InterviewApp {
 
             if (response.ok) {
                 this.closeModal();
-                this.loadQuestions(); // Перезагружаем список
+                this.loadQuestions();
                 document.getElementById('questionForm').reset();
             } else {
                 alert('Ошибка при создании вопроса');
@@ -265,6 +281,51 @@ class InterviewApp {
         } catch (error) {
             console.error('Ошибка:', error);
             alert('Ошибка при создании вопроса');
+        }
+    }
+
+    openEditModal(question) {
+        document.getElementById('editQuestionId').value = question.id;
+        document.getElementById('editQuestionTitle').value = question.title;
+        document.getElementById('editQuestionAnswer').value = question.answer;
+        document.getElementById('editQuestionTags').value = question.tags ? question.tags.join(', ') : '';
+        document.getElementById('editQuestionModal').style.display = 'block';
+        setTimeout(() => this.showEditTagSuggestions(''), 100);
+    }
+
+    closeEditModal() {
+        document.getElementById('editQuestionModal').style.display = 'none';
+        this.hideEditTagSuggestions();
+    }
+
+    async updateQuestion() {
+        const id = document.getElementById('editQuestionId').value;
+        const title = document.getElementById('editQuestionTitle').value;
+        const answer = document.getElementById('editQuestionAnswer').value;
+        const tags = document.getElementById('editQuestionTags').value
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag);
+
+        try {
+            const response = await fetch(`/api/v1/questions/up/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, answer, tags }),
+            });
+
+            if (response.ok) {
+                this.closeEditModal();
+                this.loadQuestions();
+            } else {
+                const error = await response.json();
+                alert(`Ошибка при обновлении: ${error.error}`);
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка при обновлении вопроса');
         }
     }
 
@@ -279,7 +340,6 @@ class InterviewApp {
             });
 
             if (response.ok) {
-                // ИСПРАВЛЕНО: используем lowercase id
                 this.questions = this.questions.filter(q => q.id !== id);
                 this.renderQuestions();
             } else {
@@ -294,7 +354,6 @@ class InterviewApp {
 
     openModal() {
         document.getElementById('questionModal').style.display = 'block';
-        // Показываем подсказки при открытии модального окна
         setTimeout(() => this.showTagSuggestions(''), 100);
     }
 
@@ -313,7 +372,6 @@ class InterviewApp {
     }
 }
 
-// Инициализация приложения
 document.addEventListener('DOMContentLoaded', () => {
-    new InterviewApp();
+    window.interviewApp = new InterviewApp();
 });

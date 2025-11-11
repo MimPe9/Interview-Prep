@@ -8,4 +8,5 @@ type Storage interface {
 	Close() error
 	DeleteQuestion(id int) error
 	GetQuestionByID(id int) (*models.Question, error)
+	UpdateQuestion(q *models.Question) error
 }

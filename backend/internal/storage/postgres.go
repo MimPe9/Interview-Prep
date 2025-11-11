@@ -64,6 +64,29 @@ func (s *PostgresStorage) CreateQuestion(q *models.Question) error {
 	)
 }
 
+func (s *PostgresStorage) UpdateQuestion(q *models.Question) error {
+	query := `
+		UPDATE questions
+		SET title = $1, answer = $2, tags = $3
+		WHERE id = $4
+	`
+
+	res, err := s.db.Exec(query, q.Title, q.Answer, pq.Array(q.Tags), q.ID)
+	if err != nil {
+		return fmt.Errorf("failed to update: %w", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("question with id %s not found", q.ID)
+	}
+
+	return nil
+}
+
 func (s *PostgresStorage) DeleteQuestion(id int) error {
 	query := `DELETE FROM questions WHERE id = $1`
 	res, err := s.db.Exec(query, id)

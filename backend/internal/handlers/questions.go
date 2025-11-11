@@ -28,17 +28,32 @@ func NewQuestionHandler(storage *storage.PostgresStorage, cache *cache.RedisCach
 func (h *QuestionHandler) CreateQuestion(c *gin.Context) {
 	var question models.Question
 	if err := c.BindJSON(&question); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON input"})
 		return
 	}
 
 	if err := h.storage.CreateQuestion(&question); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Can't create question"})
 		return
 	}
 
 	// Инвалидируем кэш списка вопросов
 	h.cache.Delete("questions:all")
+
+	c.JSON(http.StatusOK, question)
+}
+
+func (h *QuestionHandler) UpdateQuestion(c *gin.Context) {
+	var question models.Question
+	if err := c.BindJSON(&question); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON input"})
+		return
+	}
+
+	if err := h.storage.UpdateQuestion(&question); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update"})
+		return
+	}
 
 	c.JSON(http.StatusOK, question)
 }
@@ -57,7 +72,7 @@ func (h *QuestionHandler) GetQuestions(c *gin.Context) {
 	// Если нет в кэше, то из БД
 	questions, err = h.storage.GetAllQuestions()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Questions not found"})
 		return
 	}
 

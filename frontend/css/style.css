@@ -77,6 +77,21 @@ h1 {
     background-color: #ffebee;
 }
 
+.edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    margin-right: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #e3f2fd;
+}
+
 .question-header {
     display: flex;
     justify-content: space-between;
@@ -103,16 +118,26 @@ h1 {
     font-weight: 500;
 }
 
-.tag-golang { background-color: #00ADD8; color: white; }
-.tag-sql { background-color: #336791; color: white; }
-.tag-database { background-color: #4DB33D; color: white; }
-.tag-concurrency { background-color: #FF6B6B; color: white; }
-.tag-algorithms { background-color: #FFA726; color: white; }
-.tag-docker {background-color: #0c1149; color: white; }
-.tag-git {background-color: #b87005; color: white; }
-.tag-linux {background-color: #d6ed0c; color: white; }
-.tag-data-structures { background-color: #9C27B0; color: white; }
-.tag-net { background-color: #ce1d20; color: white; }
+.tag-golang,
+.available-tag.tag-golang { background-color: #00ADD8; color: white; }
+.tag-sql,
+.available-tag.tag-sql { background-color: #336791; color: white; }
+.tag-database,
+.available-tag.tag-database { background-color: #4DB33D; color: white; }
+.tag-concurrency,
+.available-tag.tag-concurrency { background-color: #FF6B6B; color: white; }
+.tag-algorithms,
+.available-tag.tag-algorithms { background-color: #FFA726; color: white; }
+.tag-docker,
+.available-tag.tag-docker { background-color: #0c1149; color: white; }
+.tag-git,
+.available-tag.tag-git { background-color: #b87005; color: white; }
+.tag-linux,
+.available-tag.tag-linux { background-color: #d6ed0c; color: #333; }
+.tag-data-structures,
+.available-tag.tag-data-structures { background-color: #9C27B0; color: white; }
+.tag-net,
+.available-tag.tag-net { background-color: #ce1d20; color: white; }
 
 .question-answer {
     margin-top: 15px;
@@ -129,19 +154,6 @@ h1 {
     line-height: 1.6;
     color: #555;
     white-space: pre-wrap;
-    font-family: inherit;
-}
-
-.answer-line, .indented-line {
-    margin-bottom: 0.3em;
-}
-
-.empty-line {
-    height: 0.8em;
-}
-
-.indented-line {
-    padding-left: 1.5em;
 }
 
 /* Модальное окно */
@@ -175,7 +187,9 @@ h1 {
 }
 
 #questionForm input,
-#questionForm textarea {
+#questionForm textarea,
+#editQuestionForm input,
+#editQuestionForm textarea {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -184,12 +198,14 @@ h1 {
     font-size: 14px;
 }
 
-#questionForm textarea {
+#questionForm textarea,
+#editQuestionForm textarea {
     height: 200px;
     resize: vertical;
 }
 
-#questionForm button {
+#questionForm button,
+#editQuestionForm button {
     background-color: #27ae60;
     color: white;
     border: none;
@@ -197,6 +213,12 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    width: 100%;
+}
+
+#questionForm button:hover,
+#editQuestionForm button:hover {
+    background-color: #219652;
 }
 
 /* Подсказка тегов */
@@ -222,11 +244,9 @@ h1 {
     border-radius: 10px;
     font-size: 11px;
     cursor: pointer;
-    border: 1px solid #ddd;
-    transition: all 0.2s;
+    border: 1px solid #ddd; 
 }
 
 .available-tag:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    opacity: 0.9;
 }

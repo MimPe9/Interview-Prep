@@ -30,6 +30,21 @@
                 </form>
             </div>
         </div>
+
+        <!-- Модальное окно для редактирования вопроса -->
+        <div id="editQuestionModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Редактировать вопрос</h2>
+                <form id="editQuestionForm">
+                    <input type="hidden" id="editQuestionId">
+                    <input type="text" id="editQuestionTitle" placeholder="Вопрос" required>
+                    <textarea id="editQuestionAnswer" placeholder="Развернутый ответ" required></textarea>
+                    <input type="text" id="editQuestionTags" placeholder="Теги (через запятую)">
+                    <button type="submit">Обновить</button>
+                </form>
+            </div>
+        </div>
     </div>
     
     <script src="/static/js/app.js"></script>
